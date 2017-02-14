@@ -36,6 +36,7 @@ import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 import urllib;
 import datetime;
+import json;
 
 class Mensa(callbacks.Plugin):
   """Provides the mensa command, which shows the dishes served 
@@ -58,7 +59,7 @@ class Mensa(callbacks.Plugin):
     self.__parent = super(Mensa, self)
     self.__parent.__init__(irc)
 
-  # mensa is one of { "kath", "beeth", "abend", "hbk" }
+  # mensa is one of { "kath", "beeth", "abend", "hbk" , "ptb" }
   # day is one of { "mo","di","mi","do","fr","sa","sa","tomorrow","today" }
   # return list of strings or False in case of error
   def _mensa(self, mensa = None, day = None, multiline = False):
@@ -95,12 +96,25 @@ class Mensa(callbacks.Plugin):
     # all input is evil
     if dow not in ["mo","di","mi","do","fr","sa"]:
       return False
-    if mensa not in ["kath", "beeth", "abend", "hbk"]:
+    if mensa not in ["kath", "beeth", "abend", "hbk", "ptb"]:
       return False
 
     # saturdays only in kath, otherwise http 404
     if dow == "sa" and mensa != "kath":
       return [ "Nothing." ]
+    
+    #Now featuring PTB-Casino too
+    if mensa == "ptb":
+      url = "https://blog.ktrask.de/ptbmoku.json"
+      data = json.loads(urllib.urlopen(url).read().decode("utf-8"))
+      #python3: data = json.loads(urllib.request.urlopen(url).read().decode("utf-8"))
+      ptbgerichte = {'mo': data[0], 'di': data[1], 'mi': data[2], 'do': data[3], 'fr': data[4]}
+      heading = "PTB-Casino am " + self.weekdaysPrintable[dow] + ": "
+      if multiline:
+        rply = [rply] + ptbgerichte[dow]
+      else:
+        rply = [heading + ' // '.join(ptbgerichte[dow])]
+      return rply
 
     urlpart = mensa
     if mensa == "abend":
@@ -160,8 +174,9 @@ class Mensa(callbacks.Plugin):
 
     Shows the dishes served today in <mensa>. <mensa> is one of "kath"
     (default) for Mensa 1 (Katharinenstraße), "beeth" for Mensa 2 
-    (Beethovenstraße), "hbk" for Mensa HBK or "abend" for Abendmensa
-    (Katharinenstraße, default for times between 3pm and 8pm).
+    (Beethovenstraße), "hbk" for Mensa HBK, "abend" for Abendmensa
+    (Katharinenstraße, default for times between 3pm and 8pm) or "ptb" for
+    PTB-Casino.
     <time> specifies the time to show, can be one of "mo", "di", "mi", "do",
     "fr", "sa" for the respective weekdays, or "today"/"heute" (default),
     "tomorrow"/"morgen" for todays resp. tomorrows dishes. From 8pm on, the 
@@ -185,7 +200,7 @@ class Mensa(callbacks.Plugin):
         elif argn.strip() in ["mo","di","mi","do","fr","sa","today","tomorrow"]:
           day = argn;
 
-        if argn.strip() in ["kath","beeth","abend","hbk","3"]:
+        if argn.strip() in ["kath","beeth","abend","hbk","3","ptb"]:
           mensa = argn;
         elif argn.strip().rfind("1") != -1:
           mensa = "kath";
