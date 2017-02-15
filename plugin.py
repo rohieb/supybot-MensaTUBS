@@ -96,7 +96,7 @@ class Mensa(callbacks.Plugin):
     # all input is evil
     if dow not in ["mo","di","mi","do","fr","sa"]:
       return False
-    if mensa not in ["kath", "beeth", "abend", "hbk", "ptb"]:
+    if mensa not in ["kath", "beeth", "abend", "hbk", "ptb", "360"]:
       return False
 
     # saturdays only in kath, otherwise http 404
@@ -154,6 +154,8 @@ class Mensa(callbacks.Plugin):
       heading = "Mensa HBK"
     elif mensa == "kath":
       heading = "Mensa Katharinenstraße"
+    elif mensa == "360":
+      heading = "360 Grad"
     elif mensa == "abend":
       heading = "Abendmensa Katharinenstraße"
 
@@ -178,8 +180,8 @@ class Mensa(callbacks.Plugin):
     Shows the dishes served today in <mensa>. <mensa> is one of "kath"
     (default) for Mensa 1 (Katharinenstraße), "beeth" for Mensa 2 
     (Beethovenstraße), "hbk" for Mensa HBK, "abend" for Abendmensa
-    (Katharinenstraße, default for times between 3pm and 8pm) or "ptb" for
-    PTB-Casino.
+    (Katharinenstraße, default for times between 3pm and 8pm), "360"
+    for 360 Grad, or "ptb" for PTB-Casino.
     <time> specifies the time to show, can be one of "mo", "di", "mi", "do",
     "fr", "sa" for the respective weekdays, or "today"/"heute" (default),
     "tomorrow"/"morgen" for todays resp. tomorrows dishes. From 8pm on, the 
@@ -203,7 +205,7 @@ class Mensa(callbacks.Plugin):
         elif argn.strip() in ["mo","di","mi","do","fr","sa","today","tomorrow"]:
           day = argn;
 
-        if argn.strip() in ["kath","beeth","abend","hbk","3","ptb"]:
+        if argn.strip() in ["kath","beeth","abend","hbk","3","ptb", "360"]:
           mensa = argn;
         elif argn.strip().rfind("1") != -1:
           mensa = "kath";
