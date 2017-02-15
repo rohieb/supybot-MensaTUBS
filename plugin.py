@@ -106,9 +106,12 @@ class Mensa(callbacks.Plugin):
     #Now featuring PTB-Casino too
     if mensa == "ptb":
       url = "https://blog.ktrask.de/ptbmoku.json"
-      data = json.loads(urllib.urlopen(url).read().decode("utf-8"))
+      data = json.loads(urllib.urlopen(url).read())
       #python3: data = json.loads(urllib.request.urlopen(url).read().decode("utf-8"))
-      ptbgerichte = {'mo': data[0], 'di': data[1], 'mi': data[2], 'do': data[3], 'fr': data[4]}
+      utf8_data = map(lambda w: map(lambda d: d.encode("utf8"), w), data[0:5])
+      ptbgerichte = { 'mo': utf8_data[0], 'di': utf8_data[1], 'mi': utf8_data[2], \
+          'do': utf8_data[3], 'fr': utf8_data[4] }
+
       heading = "PTB-Casino am " + self.weekdaysPrintable[dow] + ": "
       if multiline:
         rply = [heading] + ptbgerichte[dow]
