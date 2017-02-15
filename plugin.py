@@ -111,7 +111,7 @@ class Mensa(callbacks.Plugin):
       ptbgerichte = {'mo': data[0], 'di': data[1], 'mi': data[2], 'do': data[3], 'fr': data[4]}
       heading = "PTB-Casino am " + self.weekdaysPrintable[dow] + ": "
       if multiline:
-        rply = [rply] + ptbgerichte[dow]
+        rply = [heading] + ptbgerichte[dow]
       else:
         rply = [heading + ' // '.join(ptbgerichte[dow])]
       return rply
